@@ -65,7 +65,7 @@ with open('continuous_features_dict.pkl', 'rb') as f:
 
 # 加载模型
 models = {
-    'Model full': '/home/devdata/chengyl/hyptertension_cohort/catboost_regressor.pkl',
+    'Model full': 'catboost_regressor.pkl',
 }
 
 st.title("Risk Score Prediction")
@@ -78,7 +78,7 @@ with open(models[model_name], 'rb') as f:
     model = pickle.load(f)
 explainer = shap.TreeExplainer(model)
 
-with open('/home/devdata/chengyl/hyptertension_cohort/model_new/iso_reg.pkl','rb') as f:
+with open('iso_reg.pkl','rb') as f:
     iso_reg = pickle.load(f)
 
 # 获取选择的模型的特征
@@ -106,13 +106,11 @@ with col1:
         continuous_features_unit = continuous_features_unit_mappings[var]
         input_data[var] = st.slider(f"${var} {continuous_features_unit}$",min_value=range_min, max_value=range_max, value=float(int(second_dict['mean'])), step=step)
 
-# 右栏：输出结果
+
 with col2:
     st.header("Prediction Result and Feature Importance")
 
-    # 预测结果和特征重要性
     if st.button("Calculate"):
-        # 转换输入数据为 DataFrame
         for var in categorical_features:
             input_data[var] = category_mappings[var][input_data[var]]
 
@@ -124,7 +122,6 @@ with col2:
         st.write("Input DataFrame:")
         st.write(input_df)
 
-        # 预测结果
         prediction = model.predict_proba(input_df)[0, 1]
         prediction = iso_reg.transform([prediction])[0]
         if model_name == 'Model full':
@@ -147,7 +144,6 @@ with col2:
         st.write(f"Predicted Risk Score: {risk}")
         st.write(f"Prediction Value: {np.round(prediction,3)}")
 
-        # 特征重要性
         shap_values = explainer(input_df)
         feature_importance = shap_values.values[0]
         feature_names.append('Output')
