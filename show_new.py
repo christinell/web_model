@@ -5,7 +5,6 @@ import plotly.express as px
 import shap
 import _pickle as pickle
 
-# 特征和模型配置
 model_config = {
     'Model full': {
         'feature_names': ['Age','Sex','Nation','Residence','WC','BMI','CL','EF','EH','SS','DF',
@@ -22,7 +21,6 @@ model_config = {
     }
 }
 
-# 定义类别映射
 category_mappings = {
     'FLD': {'No': 0, 'Yes': 1},
     'FHTN': {'No': 0, 'Yes': 1},
@@ -37,7 +35,6 @@ category_mappings = {
     'DM': {'No': 0, 'Yes': 1},
 }
 
-#定义单位
 continuous_features_unit_mappings={
     'PLT':'_{(10^9/L)}', 
     'TC':'_{(mmol/L)}',
@@ -59,21 +56,19 @@ continuous_features_unit_mappings={
 }
 
 
-# 加载连续特征范围和步长
 with open('continuous_features_dict.pkl', 'rb') as f:
     continuous_features_dict = pickle.load(f)
 
-# 加载模型
+
 models = {
     'Model full': 'catboost_regressor.pkl',
 }
 
 st.title("Risk Score Prediction")
 
-# 模型选择框
 model_name = 'Model full'
 
-# 加载选择的模型
+
 with open(models[model_name], 'rb') as f:
     model = pickle.load(f)
 explainer = shap.TreeExplainer(model)
@@ -81,15 +76,13 @@ explainer = shap.TreeExplainer(model)
 with open('iso_reg.pkl','rb') as f:
     iso_reg = pickle.load(f)
 
-# 获取选择的模型的特征
 feature_names = model_config[model_name]['feature_names']
 categorical_features = model_config[model_name]['categorical_features']
 continuous_features = [i for i in feature_names if i not in categorical_features]
 
-# 左右分栏布局
+
 col1, col2 = st.columns(2)
 
-# 左栏：输入组件
 with col1:
     st.header("Input Parameters")
     input_data = {}
